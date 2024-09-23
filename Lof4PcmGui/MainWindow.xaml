@@ -1,0 +1,967 @@
+﻿<Window x:Class="Lof4PcmGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lof4PcmGui"
+        xmlns:viewModels="clr-namespace:Lof4PcmGui.ViewModels"
+        mc:Ignorable="d"
+        Title="Outlier for PCM" Height="1000" Width="1150"
+        DataContextChanged="MainWindow_OnDataContextChanged">
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </Window.Resources>
+    <Grid>
+        <TabControl TabStripPlacement="Bottom" Margin="5">
+            <TabItem Header="Outlier &amp; Adjust">
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <!--Load Data-->
+                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Height="26" Content="Load Matrices"
+                                    Click="ButtonLoadUfo_OnClick"/>
+
+                    <TextBlock  Grid.Row="1" Grid.Column="0"
+                                Margin="2" Text="Data File:" 
+                                HorizontalAlignment="Right" 
+                                TextAlignment="Right"/>
+                    <TextBlock   Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                         Margin="2" Text="{Binding FilepathnameCalcLof}" 
+                                         HorizontalAlignment="Left" Foreground="Blue"
+                                         TextAlignment="Left"/>
+
+                    <!--ProgressBar of data load-->
+                    <ProgressBar  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"  Margin="5"
+                                          Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                          Minimum="0" Maximum="100"
+                                          IsIndeterminate="{Binding IsReadDataFromFile}"
+                                          IsEnabled="{Binding Calculating}"
+                                          Value="{Binding ProgressValueDataLoad}" />
+
+                    <!--Progress text of data load-->
+                    <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                                       Margin="5" Text="{Binding ProcessTextValueDataLoad}" 
+                                       HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                    <!--parameters of generating-->
+                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                                    Margin="2" Text="{Binding ParametersOfLoadedData}" 
+                                    HorizontalAlignment="Left" 
+                                    TextAlignment="Left"/>
+
+                    <!--Outlier algorithm selection-->
+                    <RadioButton Grid.Row="5" Grid.Column="0" GroupName="OutlinerAlgorithm"
+                                 VerticalContentAlignment="Center"
+                              Content="LOF" IsChecked="{Binding IsLof}"/>
+                    <RadioButton Grid.Row="5" Grid.Column="1" GroupName="OutlinerAlgorithm"
+                                 VerticalContentAlignment="Center"
+                                 Content="KNN" IsChecked="{Binding IsKnn}"/>
+
+                    <!--LOF calc-->
+                    <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="3" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Height="26" Content="Outliers Calculate"
+                                    Click="ButtonStartCalcLofUfo_OnClick"/>
+
+                    <!--ProgressBar of LOF UFO-->
+                    <ProgressBar  Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"  Margin="5"
+                                          Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                          Minimum="0" Maximum="100"
+                                          IsEnabled="{Binding Calculating}"
+                                          Value="{Binding ProgressValueLofCalc}" />
+
+                    <!--Progress text of LOF UFO-->
+                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"
+                                       Margin="5" Text="{Binding ProcessTextValueLofOfUfo}" 
+                                       HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                    <!--Stop button-->
+                    <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" 
+                                    IsEnabled="{Binding Calculating}"
+                                    Margin="5" Height="26" Content="Stop!"
+                                    Click="ButtonStopCalcLofUfo_OnClick"/>
+
+                    <!--Progress text of LOF UFO-->
+                    <TextBlock Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3"
+                               Margin="5" Text="{Binding LofStatisticText}" 
+                               HorizontalAlignment="Left" TextAlignment="Left"/>
+
+                    <!--LOF statistic result-->
+                    <Grid  Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="0" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                Text="Legend of Chart:" TextAlignment="Right"/>
+                            <TextBox Grid.Column="1" Margin="3,0,0,0"
+                                     x:Name="tbLegend"/>
+                        </Grid>
+                        <ListBox Grid.Row="1" Grid.Column="0" Margin="0,6,0,0"
+                                 SelectionMode="Single"
+                                 ItemsSource="{Binding OutlierResults}"
+                                 SelectionChanged="OutlierResults_OnSelected">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Dimense:"/>
+                                        <TextBlock Text="{Binding Path=Dimense, Mode=OneWay}" Foreground="Blue"/>
+
+                                        <TextBlock Text="UniqueItemNumber:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=UniqueItemNumber, Mode=OneWay}"
+                                                   Foreground="Blue"/>
+
+                                        <TextBlock Text="Amount:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=Amount, Mode=OneWay}" Foreground="Blue"/>
+
+                                        <TextBlock Text="Avg:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=Avg, Mode=OneWay, StringFormat=f6}" Foreground="Blue"/>
+
+                                        <TextBlock Text="Std:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=Std, Mode=OneWay, StringFormat=f6}" Foreground="Blue"/>
+
+                                        <TextBlock Text="MinOutlierOfMatrix:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=MinOuterlier, Mode=OneWay, StringFormat=f6}" Foreground="Blue"/>
+
+                                        <TextBlock Text="MaxOutlierOfMatrix:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=MaxOuterlier, Mode=OneWay, StringFormat=f6}" Foreground="Blue"/>
+
+                                        <TextBlock Text="Mismatch:" Margin="5,0,0,0"/>
+                                        <TextBlock Text="{Binding Path=Mismatch, Mode=OneWay}" Foreground="Blue"/>
+
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <ScottPlot:WpfPlot Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" x:Name="PlotOutlier"/>
+                    </Grid>
+
+                    <Separator Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="3" 
+                               Margin="0,9,0,0" BorderBrush="Blue" BorderThickness="1"/>
+
+                    <!--Unconsistent reason check-->
+                    <Grid  Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,9,0,0" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="199" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" 
+                                IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                Margin="2" Content="Check Inconsistence Type"
+                                Click="ButtonCheckInconsistenceType_OnClick"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="Total:" TextAlignment="Right"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="{Binding CheckResultTotal}" TextAlignment="Right"
+                                   Foreground="Blue"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="UFO:" TextAlignment="Right"/>
+                        <TextBlock Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="{Binding CheckResultUfoCount}" 
+                                   Foreground="Blue"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="EA:" TextAlignment="Right"/>
+                        <TextBlock Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="{Binding CheckResultEaCount}"
+                                   Foreground="Blue"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="7" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="UFO Rate:" TextAlignment="Right"/>
+                        <TextBlock Grid.Row="0" Grid.Column="8" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="{Binding CheckResultUfoRate}"
+                                   Foreground="Blue"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="9" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="EA Rate:" TextAlignment="Right"/>
+                        <TextBlock Grid.Row="0" Grid.Column="10" VerticalAlignment="Center" Margin="3,0,0,0"
+                                   Text="{Binding CheckResultEaRate}"
+                                   Foreground="Blue"/>
+
+                        <CheckBox Grid.Row="0" Grid.Column="12" 
+                                     VerticalContentAlignment="Center"
+                                     Content="3δ" IsChecked="{Binding Is3Sigma}"/>
+
+
+                        <!--ProgressBar of Inconsistent Reason Check-->
+                        <ProgressBar  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="13"  Margin="5"
+                                      Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                      Minimum="0" Maximum="100"
+                                      IsEnabled="{Binding Calculating}"
+                                      Value="{Binding ProgressValueReasonCheck}" />
+                    </Grid>
+
+                    <Separator Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="3" 
+                               Margin="0,9,0,0" BorderBrush="Blue" BorderThickness="1"/>
+
+                    <TabControl Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="3" 
+                                TabStripPlacement="Top" Margin="5">
+                        <TabItem Header="Optimal Direction">
+                            <Grid Margin="0,9,0,0" >
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Height="26"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Content="Check Optimal Direction Adjust"
+                                    Click="ButtonCheckOptimalDirectionAdjust_OnClick"/>
+
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="3,0,0,0"
+                                       Text="Adjusted:" TextAlignment="Right"/>
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="3,0,0,0"
+                                       Text="{Binding CheckAdjustRate}"
+                                       Foreground="Blue"/>
+
+                                    <CheckBox Grid.Column="3" 
+                                      VerticalContentAlignment="Center"
+                                      Content="Adjust by Original Matrix" IsChecked="{Binding OptimalDirectionUsingOriMatrix}"/>
+                                </Grid>
+
+                                <!--ProgressBar of Adjust Check-->
+                                <ProgressBar  Grid.Row="1" Margin="5"
+                                      Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                      Minimum="0" Maximum="100"
+                                      IsEnabled="{Binding Calculating}"
+                                      Value="{Binding ProgressValueAdjustCheck}" />
+
+                                <ListBox Grid.Row="2" Margin="5"
+                                 SelectionMode="Single"
+                                 ItemsSource="{Binding AdjustCheckResults}" >
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Adjust Times:"/>
+                                                <TextBlock Text="{Binding Path=Times, Mode=OneWay}" Foreground="Blue"/>
+
+                                                <TextBlock Text="Amount:" Margin="5,0,0,0"/>
+                                                <TextBlock Text="{Binding Path=Count, Mode=OneWay}"
+                                                   Foreground="Blue"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </TabItem>
+
+                        <TabItem Header="Minimum Change">
+                            <Grid Margin="0,9,0,0" >
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Height="26"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Content="Check Minimum Change Adjust"
+                                    Click="ButtonCheckMinChangeAdjust_OnClick"/>
+
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0"
+                                               Text="{Binding ProgressCountMinChangeCheck}"
+                                               Foreground="Blue"/>
+
+                                    <!--<TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="3,0,0,0"
+                                       Text="Adjusted:" TextAlignment="Right"/>
+                                    <TextBlock Grid.Column="3" VerticalAlignment="Center" Margin="3,0,0,0"
+                                       Text="{Binding CheckMinChangeRate}"
+                                       Foreground="Blue"/>-->
+                                </Grid>
+
+                                <!--ProgressBar of Minimum Change Check-->
+                                <ProgressBar  Grid.Row="1" Margin="5"
+                                      Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                      Minimum="0" Maximum="100"
+                                      IsEnabled="{Binding Calculating}"
+                                      Value="{Binding ProgressValueMinChangeCheck}" />
+
+                                <ListBox Grid.Row="2" Margin="5"
+                                 SelectionMode="Single"
+                                 ItemsSource="{Binding MinimumChangeCheckResults}" >
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Path=RangeString, Mode=OneWay}" Foreground="Blue"/>
+
+                                                <TextBlock Text="Total:"/>
+                                                <TextBlock Text="{Binding Path=TotalOfRange, Mode=OneWay}" Foreground="Blue"/>
+
+                                                <TextBlock Text="Adjusted:" Margin="5,0,0,0"/>
+                                                <TextBlock Text="{Binding Path=AdjustOkCounterOfRange, Mode=OneWay}"
+                                                   Foreground="Blue"/>
+
+                                                <TextBlock Text="Adjusted Rate:" Margin="5,0,0,0"/>
+                                                <TextBlock Text="{Binding Path=OkRateOfRange, Mode=OneWay}"
+                                                   Foreground="Blue"/>
+
+                                                <TextBlock Text="Change AVG:" Margin="5,0,0,0"/>
+                                                <TextBlock Text="{Binding Path=AvgAvgChangeOfRange, Mode=OneWay, StringFormat=f6}"
+                                                           Foreground="Blue"/>
+
+                                                <TextBlock Text="Change STD:" Margin="5,0,0,0"/>
+                                                <TextBlock Text="{Binding Path=StdAvgChangeOfRange, Mode=OneWay, StringFormat=f6}"
+                                                           Foreground="Blue"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="PCM Generator">
+                <TabControl Margin="5">
+                    <TabItem Header="Perfectly">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="26" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" 
+                                       Margin="5" Text="Dimense:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" 
+                                       Margin="5" Text="{Binding DimensePerfectly}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="0" Grid.Column="2" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="3" Maximum="15"
+                                    Value="{Binding DimensePerfectly, Mode=TwoWay}"/>
+                            <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                      IsChecked="{Binding WithTuningPerfectly, Mode=TwoWay}"
+                                      Content="Apply a fine-tuning of [-0.5, 0.5] to each item."/>
+                            <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                      IsChecked="{Binding CanOffDiagonalEqualsOnePerfectly, Mode=TwoWay}"
+                                      Content="Off-diagonal items can be 1"/>
+
+                            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Height="26" Content="Generate"
+                                    Click="ButtonPerfectlyPcmGenerate_OnClick"/>
+                            <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    IsReadOnly="True" Text="{Binding PerfectlyPcmText}"/>
+                            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                                       Margin="5" Text="{Binding PerfectlyElapsedText}" 
+                                       HorizontalAlignment="Left" Foreground="Blue"
+                                       TextAlignment="Left"/>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="Unusual and False Observations, UFO">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="26" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="26" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" 
+                                       Margin="5" Text="Dimense:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" 
+                                       Margin="5" Text="{Binding DimenseUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="0" Grid.Column="2" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="3" Maximum="15"
+                                    Value="{Binding DimenseUfo, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="3" 
+                                       Margin="5" Text="UFO Count:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="0" Grid.Column="4" 
+                                       Margin="5" Text="{Binding UfoCountUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="0" Grid.Column="5" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="1" Maximum="7"
+                                    Value="{Binding UfoCountUfo, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" 
+                                       Margin="5" Text="Min Change Lvl:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" 
+                                       Margin="5" Text="{Binding MinAdjustLevelUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="2" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="2" Maximum="10"
+                                    Value="{Binding MinAdjustLevelUfo, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="3" 
+                                       Margin="5" Text="Max Change Lvl:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Grid.Column="4" 
+                                       Margin="5" Text="{Binding MaxAdjustLevelUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="5" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="3" Maximum="15"
+                                    Value="{Binding MaxAdjustLevelUfo, Mode=TwoWay}"/>
+
+
+                            <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                      Header="Generate 1 PCM">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Button Grid.Row="0"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="5" Height="26" Content="Generate a PCM"
+                                            Click="ButtonUfoPcmGenerate_OnClick"/>
+                                    <TextBox Grid.Row="1"
+                                             IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                             IsReadOnly="True" Text="{Binding UfoPcmText}"/>
+                                    <TextBlock Grid.Row="2"
+                                               Margin="5" Text="{Binding Ufo1ElapsedText}" 
+                                               HorizontalAlignment="Left" Foreground="Blue"
+                                               TextAlignment="Left"/>
+                                </Grid>
+                            </GroupBox>
+
+                            <GroupBox Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3"
+                                      Header="Generate multiple PCMs">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="27"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" 
+                                               Margin="5" Text="Count:" 
+                                               HorizontalAlignment="Right"
+                                               TextAlignment="Right"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                               IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                               Margin="5" Text="{Binding NumberOfGeneratedPcmsUfoStr}" 
+                                               PreviewTextInput="NumberTextBox_OnPreviewTextInput"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" 
+                                               Margin="5" Text="Save2:" 
+                                               HorizontalAlignment="Right"
+                                               TextAlignment="Right"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" 
+                                             IsReadOnly="True"
+                                             Margin="3, 3, 1, 3" Text="{Binding UfoMultiSaveFilePathname}" />
+                                    <Button Grid.Row="1" Grid.Column="2"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="1, 3, 3, 3" Content=" ... "
+                                            Foreground="Gray"
+                                            Click="ButtonBrowserUfo_OnClick"/>
+
+                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="5" Height="26" Content="Generate multiple PCM"
+                                            Click="ButtonUfoMultiStart_OnClick"/>
+
+                                    <ProgressBar  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"  Margin="5"
+                                                  Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                                  Minimum="0" Maximum="100"
+                                                  IsEnabled="{Binding Calculating}"
+                                                  Value="{Binding ProgressValueUfo}" />
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Margin="5" Text="{Binding ProcessTextValueUfo}" 
+                                               HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                                    <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding Calculating}"
+                                            Margin="5" Height="26" Content="Stop!"
+                                            Click="ButtonUfoMultiStop_OnClick"/>
+
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Margin="5" Text="{Binding UfoMultiElapsedText}" 
+                                               HorizontalAlignment="Center" Foreground="Blue"
+                                               TextAlignment="Center"/>
+
+
+                                </Grid>
+                            </GroupBox>
+
+                        </Grid>
+
+                    </TabItem>
+
+                    <TabItem Header="Error Accumulation, EA">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="36" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="36" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" 
+                                       Margin="5" Text="Dimense:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" 
+                                       Margin="5" Text="{Binding DimenseEa}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="0" Grid.Column="2" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="3" Maximum="15"
+                                    Value="{Binding DimenseEa, Mode=TwoWay}"/>
+
+                            <CheckBox Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="3" Margin="5"
+                                      IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                      IsChecked="{Binding CanOffDiagonalEqualsOneEa, Mode=TwoWay}"
+                                      Content="Off-diagonal items can be 1"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" 
+                                       Margin="5" Text="Min CR:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" 
+                                       Margin="5" Text="{Binding MinCrEa, StringFormat=f2}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="2" SmallChange="0.05" LargeChange="0.1" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="0.02" Maximum="0.5"
+                                    Value="{Binding MinCrEa, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="3" 
+                                       Margin="5" Text="Max Bias:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Grid.Column="4" 
+                                       Margin="5" Text="{Binding AdjustBias, StringFormat=f2}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="5" SmallChange="0.05" LargeChange="0.1"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="0.5" Maximum="3.0"
+                                    Value="{Binding AdjustBias, Mode=TwoWay}"/>
+
+
+                            <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                      Header="Generate 1 PCM">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Button Grid.Row="0"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="5" Height="26" Content="Generate a PCM"
+                                            Click="ButtonEaPcmGenerate_OnClick"/>
+                                    <TextBox Grid.Row="1"
+                                             IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                             IsReadOnly="True" Text="{Binding EaPcmText}"/>
+                                    <TextBlock Grid.Row="2"
+                                               Margin="5" Text="{Binding Ea1ElapsedText}" 
+                                               HorizontalAlignment="Left" Foreground="Blue"
+                                               TextAlignment="Left"/>
+                                </Grid>
+                            </GroupBox>
+
+                            <GroupBox Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="3"
+                                      Header="Generate multiple PCMs">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="27"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" 
+                                               Margin="5" Text="Count:" 
+                                               HorizontalAlignment="Right"
+                                               TextAlignment="Right"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                               IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                               Margin="5" Text="{Binding NumberOfGeneratedPcmsEaStr}" 
+                                               PreviewTextInput="NumberTextBox_OnPreviewTextInput"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" 
+                                               Margin="5" Text="Save2:" 
+                                               HorizontalAlignment="Right"
+                                               TextAlignment="Right"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" 
+                                             IsReadOnly="True"
+                                             Margin="3, 3, 1, 3" Text="{Binding EaMultiSaveFilePathname}" />
+                                    <Button Grid.Row="1" Grid.Column="2"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="1, 3, 3, 3" Content=" ... "
+                                            Foreground="Gray"
+                                            Click="ButtonBrowserEa_OnClick"/>
+
+                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="5" Height="26" Content="Generate multiple PCM"
+                                            Click="ButtonEaMultiStart_OnClick"/>
+
+                                    <ProgressBar  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"  Margin="5"
+                                                  Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                                  Minimum="0" Maximum="100"
+                                                  IsEnabled="{Binding Calculating}"
+                                                  Value="{Binding ProgressValueEa}" />
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Margin="5" Text="{Binding ProcessTextValueEa}" 
+                                               HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                                    <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding Calculating}"
+                                            Margin="5" Height="26" Content="Stop!"
+                                            Click="ButtonEaMultiStop_OnClick"/>
+
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Margin="5" Text="{Binding EaMultiElapsedText}" 
+                                               HorizontalAlignment="Center" Foreground="Blue"
+                                               TextAlignment="Center"/>
+                                </Grid>
+                            </GroupBox>
+
+                        </Grid>
+
+                    </TabItem>
+
+                    <TabItem Header="EA &amp; UFO">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="36" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="36" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" 
+                                       Margin="5" Text="Dimense:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" 
+                                       Margin="5" Text="{Binding DimenseEaUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="0" Grid.Column="2" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="3" Maximum="15"
+                                    Value="{Binding DimenseEaUfo, Mode=TwoWay}"/>
+
+                            <CheckBox Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="3" Margin="5"
+                                      IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                      IsChecked="{Binding CanOffDiagonalEqualsOneEaUfo, Mode=TwoWay}"
+                                      Content="Off-diagonal items can be 1"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" 
+                                       Margin="5" Text="NoUFO MaxCR:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" 
+                                       Margin="5" Text="{Binding NoUfoMaxCr, StringFormat=f2}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="2" SmallChange="0.05" LargeChange="0.1" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="0.02" Maximum="0.5"
+                                    Value="{Binding NoUfoMaxCr, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="3" 
+                                       Margin="5" Text="Max Bias:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Grid.Column="4" 
+                                       Margin="5" Text="{Binding AdjustBiasEaUfo, StringFormat=f2}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="5" SmallChange="0.05" LargeChange="0.1"
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="0.5" Maximum="3.0"
+                                    Value="{Binding AdjustBiasEaUfo, Mode=TwoWay}"/>
+
+                            <!--UFO paras-->
+                            <TextBlock Grid.Row="2" Grid.Column="0" 
+                                       Margin="5" Text="Min CR:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" 
+                                       Margin="5" Text="{Binding MinCrEaUfo, StringFormat=f2}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="2" Grid.Column="2" SmallChange="0.05" LargeChange="0.1" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="0.02" Maximum="0.5"
+                                    Value="{Binding MinCrEaUfo, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="3" 
+                                       Margin="5" Text="UFO Count:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="2" Grid.Column="4" 
+                                       Margin="5" Text="{Binding EaUfoCountUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="2" Grid.Column="5" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="1" Maximum="7"
+                                    Value="{Binding EaUfoCountUfo, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" 
+                                       Margin="5" Text="Min Change Lvl:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" 
+                                       Margin="5" Text="{Binding MinAdjustLevelEaUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="3" Grid.Column="2" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="2" Maximum="10"
+                                    Value="{Binding MinAdjustLevelEaUfo, Mode=TwoWay}"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="3" 
+                                       Margin="5" Text="Max Change Lvl:" 
+                                       HorizontalAlignment="Right"
+                                       TextAlignment="Right"/>
+                            <TextBlock Grid.Row="3" Grid.Column="4" 
+                                       Margin="5" Text="{Binding MaxAdjustLevelEaUfo}" 
+                                       HorizontalAlignment="Center" Foreground="Red"
+                                       TextAlignment="Center"/>
+                            <Slider Grid.Row="3" Grid.Column="5" 
+                                    IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                    Margin="5" Minimum="3" Maximum="15"
+                                    Value="{Binding MaxAdjustLevelEaUfo, Mode=TwoWay}"/>
+
+                            <!--End of UFO paras-->
+
+                            <GroupBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                                      Header="Generate 1 PCM">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Button Grid.Row="0"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="5" Height="26" Content="Generate a PCM"
+                                            Click="ButtonEaUfoPcmGenerate_OnClick"/>
+                                    <TextBox Grid.Row="1"
+                                             IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                             IsReadOnly="True" Text="{Binding EaPcmText}"/>
+                                    <TextBlock Grid.Row="2"
+                                               Margin="5" Text="{Binding Ea1ElapsedText}" 
+                                               HorizontalAlignment="Left" Foreground="Blue"
+                                               TextAlignment="Left"/>
+                                </Grid>
+                            </GroupBox>
+
+                            <GroupBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="3"
+                                      Header="Generate multiple PCMs">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="27"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" 
+                                               Margin="5" Text="Count:" 
+                                               HorizontalAlignment="Right"
+                                               TextAlignment="Right"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                               IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                               Margin="5" Text="{Binding NumberOfGeneratedPcmsEaUfoStr}" 
+                                               PreviewTextInput="NumberTextBox_OnPreviewTextInput"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" 
+                                               Margin="5" Text="Save2:" 
+                                               HorizontalAlignment="Right"
+                                               TextAlignment="Right"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" 
+                                             IsReadOnly="True"
+                                             Margin="3, 3, 1, 3" Text="{Binding EaUfoMultiSaveFilePathname}" />
+                                    <Button Grid.Row="1" Grid.Column="2"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="1, 3, 3, 3" Content=" ... "
+                                            Foreground="Gray"
+                                            Click="ButtonBrowserEaUfo_OnClick"/>
+
+                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding Calculating, Converter={StaticResource InverseBooleanConverter}}"
+                                            Margin="5" Height="26" Content="Generate multiple PCM"
+                                            Click="ButtonEaUfoMultiStart_OnClick"/>
+
+                                    <ProgressBar  Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"  Margin="5"
+                                                  Height="55" Orientation="Horizontal" FlowDirection="LeftToRight"
+                                                  Minimum="0" Maximum="100"
+                                                  IsEnabled="{Binding Calculating}"
+                                                  Value="{Binding ProgressValueEaUfo}" />
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Margin="5" Text="{Binding ProcessTextValueEaUfo}" 
+                                               HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                                    <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding Calculating}"
+                                            Margin="5" Height="26" Content="Stop!"
+                                            Click="ButtonEaUfoMultiStop_OnClick"/>
+
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Margin="5" Text="{Binding EaUfoMultiElapsedText}" 
+                                               HorizontalAlignment="Center" Foreground="Blue"
+                                               TextAlignment="Center"/>
+                                </Grid>
+                            </GroupBox>
+
+                        </Grid>
+
+                    </TabItem>
+
+                </TabControl>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
