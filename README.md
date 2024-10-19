@@ -2,7 +2,7 @@
 
 The source code and experimental data of "A Comprehensive Approach to Correcting Inconsistent Pairwise Comparison Matrices".
 
-The code includes: a KNN-based algorithm for identifying the causes of inconsistency in pairwise comparison matrices; 2. two consistency correction algorithms; 3. generation of training and testing data, along with the corresponding training and testing code; 4. GUI.
+The code includes: 1. a KNN-based algorithm for identifying the causes of inconsistency in pairwise comparison matrices; 2. two consistency correction algorithms; 3. generation of training and testing data, along with the corresponding training and testing code; 4. GUI.
 
 - Source code folder: *Lof4PcmGui*
 - Statistical data of experimental results: *Exp.Data_20240628.xlsx*
